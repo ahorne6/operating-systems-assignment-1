@@ -1,0 +1,1 @@
+/* consumer takes items off table */
