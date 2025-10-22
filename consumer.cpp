@@ -5,21 +5,27 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <conio.h>
+#include <tchar.h>
+#include <windows.h>
 #include "memorybuff.hpp"
 
 
 
 int main(int argc, char *argv[]){
-    int fileDesc;
-    char * sharedMemPath;
+    HANDLE fileDesc;
+    const char* sharedMemPath = argv[1];
     struct sharedMem *consumingMem;
+    
 
-    sharedMemPath = argv[1];
-    fileDesc = shm_open(sharedMemPath, O_RDWR, 0);
+    // fileDesc = shm_open(sharedMemPath, O_RDWR, 0);
+    fileDesc = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, 0, TABLE_SIZE, PAGE_READWRITE,  sharedMemPath);
 
-    ftruncate(fileDesc, sizeof(*consumingMem));
+    // ftruncate(fileDesc, sizeof(*consumingMem));
 
-    consumingMem = static_cast<sharedMem*>(CreateFileMapping(NULL, NULL, PAGE_EXECUTE_READWRITE, sizeof(*consumingMem), fileDesc, 0));
+    // consumingMem = static_cast<sharedMem*>(CreateFileMapping(NULL, NULL, PAGE_EXECUTE_READWRITE, sizeof(*consumingMem), fileDesc, 0));
+    //  consMem = static_cast<sharedMem*>(mmap(NULL, sizeof(*consMem), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
+    consumingMem = static_cast<sharedMem*>(VirtualAlloc(NULL, sizeof(*consumingMem), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE));
 
     for (int i = 4; i >= 0; --i) {
         sem_wait(&(consumingMem->full));
@@ -35,7 +41,8 @@ int main(int argc, char *argv[]){
 
 
     //Detatch mem
-    shm_unlink(sharedMemPath);
+    CloseHandle(fileDesc);
+
 
 
     return 0;

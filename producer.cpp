@@ -13,16 +13,15 @@
 #include <windows.h>
 
 int main(int argc, char *argv[]){
-    int fileDesc;
-    char *sharedMemPath;
+    HANDLE fileDesc;
+    const char *sharedMemPath = argv[1];
     struct sharedMem *semMemAccessor;
 
-    sharedMemPath = argv[1];
 
-    fileDesc = shm_open(sharedMemPath, O_CREAT | O_EXCL | O_RDWR, 0600);      //open memory
+    fileDesc = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, 0, TABLE_SIZE, PAGE_READWRITE,  sharedMemPath);     //open memory
 
-    ftruncate(fileDesc, sizeof(*semMemAccessor));    //ensure correct sizing
-    semMemAccessor = static_cast<sharedMem*>(CreateFileMapping(NULL, NULL, PAGE_EXECUTE_READWRITE, sizeof(*semMemAccessor), fileDesc, 0));
+    
+    semMemAccessor = static_cast<sharedMem*>(VirtualAlloc(NULL, sizeof(*semMemAccessor), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE));
 
     sem_init(&(semMemAccessor->mutex), 1,1);
     
@@ -52,9 +51,7 @@ int main(int argc, char *argv[]){
         sem_post(&semMemAccessor->full);
                 //produced, release mutex and buffer is full
     }
-    shm_unlink(sharedMemPath);
-
-
+    CloseHandle(fileDesc);
     return 0;
     
 }
