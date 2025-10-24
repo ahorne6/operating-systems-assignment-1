@@ -8,20 +8,20 @@ msg:
 
 
 
-consumer: ./consumer.cpp
-	g++ "./consumer.cpp" -pthread -o ./out/consumer
+consumer: ./src/consumer.cpp
+	g++ "./src/consumer.cpp" -pthread -o ./out/consumer
 
 
-producer: ./producer.cpp
-	g++ "./producer.cpp" -pthread -o ./out/producer
+producer: ./src/producer.cpp
+	g++ "./src/producer.cpp" -pthread -o ./out/producer
 
 
 run: ./src
 	
 	make producer
 	make consumer
-	clear
-	./out/producer shmfile & ./out/consumer shmfile
+	"start" "./../out/producer.exe shmfile" "&&" "start" "./../out/consumer.exe shmfile"  
+# 	/../out/producer shmfile "&" /../out/consumer shmfile
 
 clean:
 	rm -f ./out/consumer
