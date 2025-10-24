@@ -17,9 +17,7 @@ int main(int argc, char *argv[]){
     const char *sharedMemPath = argv[1];
     struct sharedMem *semMemAccessor;
 
-
     fileDesc = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, 0, TABLE_SIZE, PAGE_READWRITE,  sharedMemPath);     //open memory
-
     
     semMemAccessor = static_cast<sharedMem*>(VirtualAlloc(NULL, sizeof(*semMemAccessor), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE));
 
@@ -45,8 +43,6 @@ int main(int argc, char *argv[]){
 
         semMemAccessor->in = (semMemAccessor->in + 1) % TABLE_SIZE;  //ONLY 0-TABLE SIZE (2)
 
-
-        
         sem_post(&semMemAccessor->mutex); 
         sem_post(&semMemAccessor->full);
                 //produced, release mutex and buffer is full
