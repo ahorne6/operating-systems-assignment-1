@@ -1,0 +1,60 @@
+Program Description:
+    This program is meant to display mutual exclusion with shared memory using semaphores. The program has two source files, producer and consumer, which are meant to communicate via shared memory.
+    The producer program generates random numbers when there is space in the shared memory "table" (specified by the sharedMem ADT), and the consumer accesses the shared memory in order to take these random numbers off of the table when they are present.
+    When the table is complete (tracked by semaphore full), the producer will wait. When there are no items (tracked by semaphore empty), the consumer will wait.
+    Semaphore mutex acts as a mutex lock, not allowing both programs to access the memory at once. If the producer is currently adding onto the table, the semaphore will lock the memory so that the consumer may not access it, and vice versa.
+    An example of the expected output looks like:
+        Produced 1642
+        Produced 30
+        Consumed 1642
+        Consumed 30 
+        Produced 410
+        Produced 5
+        Consumed 410
+        Consumed 5
+
+File Descriptions:
+   src/consumer.cpp
+        This program. when compiled and ran, will work in tandem with the producer and wait until the producer places items on the table in shared memory, where it will then take those items off the table and into itself, and then print the item to the terminal. Then, it will return to waiting for items.
+   src/producer.cpp
+        This program, when compiled and ran, will work in tandem with the consumer and create random numbers, print them to the terminal, and place them onto the table in shared memory until it is full. Then, it will then wait for the consumer to take them off so it can repeat and create more items. 
+   makefile
+        This file provides easy instructions on how to compile and execute the program.
+   memorybuff.hpp 
+        This file stores the struct for sharedMem, which is necessary for integrating the shared memory between producer and consumer. It also contains the initialization for the three sem_t semaphore variables.
+
+
+Usage Instructions:
+    This program is meant to run on a Windows operating system, but is currently not running as necessary, and may not run properly.
+    The program can be run from command line (not preferred) with   
+        g++ "./src/consumer.cpp" -pthread -o ./out/consumer
+        g++ "./src/producer.cpp" -pthread -o ./out/producer
+        start ./../out/producer.exe shmfile && start ./../out/consumer.exe shmfile
+
+    The program can be run from the makefile (preferred) with   
+        make run  
+    which compiles both programs and runs them together. 
+
+
+Key Component Explanation:
+    Semaphores are a synchronization tool that in this project are used to mediate access to shared memory and communicate between two programs. They are useful in implementation of mutex locks, but are more complex. 
+    Mutual exclusion is a term meaning that two things cannot coexist. In this case, the mutual exclusion pertains to when the producer and consumer are allowed to access the shared memory. Mutual exlusion guarantees that they may not acces it at the same time.
+    The shared memory buffer is a section of memory which is named and is accessible to both programs. The 'table' created in the sharedMem ADT defines that there are two slots in this shared memory for data to be placed into, being a 1x2 array of integers. 
+Examples & Results: 
+    Example output: 
+        Produced 74021
+        Produced 4010
+        Consumed 74021
+        Consumed 4010
+        Produced 82301
+        Produced 34
+        Consumed 82301
+        Consumed 34
+        Produced 140592
+        Produced 19485
+        Consumed 140592
+        Consumed 19485
+
+
+    Results:
+        I was not able to create the program to the specifications. I learned a lot about the implementation of semaphores, mutex locks, and shared memory, and I believe I made good progress on implementation, but was not able to fully complete this program.
